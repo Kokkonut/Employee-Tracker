@@ -13,7 +13,7 @@ Departments.init(
         name: {
             type: DataTypes.STRING,
         }
-    }
+    },
     {
         sequelize,
         timestamps: false,
