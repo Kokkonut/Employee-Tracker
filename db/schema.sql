@@ -1,31 +1,62 @@
+-- Initialize and Configure Database
+DROP DATABASE IF EXISTS employee_db;
+CREATE database employee_db;
 
-DROP DATABASE IF EXISTS employees_DB;
-CREATE database employees_DB;
+-- Select employee_db as the database to utilize and perform SQL operations on
+USE employee_db;
 
-USE employees_DB;
+-- Create table department
+CREATE TABLE department (
 
-CREATE TABLE Departments (
-  dept_id       INTEGER         AUTO_INCREMENT      NOT NULL,
-  name          VARCHAR(100)                        NOT NULL,
-  PRIMARY KEY (dept_id)
+    -- Create unique id for each item
+    id INT NOT NULL AUTO_INCREMENT,
+    
+    -- Set col dept_name to accept variable-length strings of max 30 characters, where data feild recieved cannot be empty
+    dept_name VARCHAR(30) NOT NULL,
+
+    -- Set id as the primary key to uniquely identify each item in this table
+    PRIMARY KEY (id)
 );
 
-CREATE TABLE Roles (
-  role_id       INTEGER         AUTO_INCREMENT      NOT NULL,
-  title         VARCHAR(100)                        NOT NULL,
-  salary        DECIMAL(10,2)                       NOT NULL,
-  dept_id       INTEGER,
-  PRIMARY KEY (role_id),
-  FOREIGN KEY (dept_id) REFERENCES Departments(dept_id)
+-- Create table employee
+CREATE TABLE employees (
+
+    -- Create unique id for each item
+    id INT NOT NULL AUTO_INCREMENT,
+
+    -- Set col first_name to accept variable-length strings of max 30 characters, where data feild recieved cannot be empty
+    first_name VARCHAR(30) NOT NULL,
+
+    -- Set col last_name to accept variable-length strings of max 30 characters, where data feild recieved can be empty
+    last_name VARCHAR(30) NULL,
+    
+    -- Set col role_id to accept only integers, where data feild recieved cannot be empty
+    role_id INT NOT NULL,
+
+    -- Set col manager_id to accept only integers, where data feild recieved cannot be empty
+    manager_id INT NOT NULL,
+    
+    -- Set id as the primary key to uniquely identify each item in this table
+    PRIMARY KEY (id)
+
 );
 
-CREATE TABLE Employees (
-  emp_id        INTEGER         AUTO_INCREMENT      NOT NULL,
-  first_name    VARCHAR(30)                         NOT NULL,
-  last_name     VARCHAR(30),
-  role_id       INTEGER,
-  manager_id    INTEGER,
-  PRIMARY KEY (emp_id),
-  FOREIGN KEY (role_id) REFERENCES Roles(role_id),
-  FOREIGN KEY (manager_id) REFERENCES Employees(emp_id)
+-- Create table roles
+create table roles (
+
+    -- Create unique id for each item
+    id INT NOT NULL AUTO_INCREMENT,
+
+    --  Set col title to accept variable-length strings of max 30 characters, where data feild recieved cannot be empty
+    title VARCHAR(30) NOT NULL,
+
+    -- Set col salary to accept decimal numberical values, where data feild recieved cannot be empty
+    salary DECIMAL NOT NULL,
+
+    -- Set col department_id to accept only integers, where data feild recieved cannot be empty
+    department_id INT NOT NULL,
+
+    -- Set id as the primary key to uniquely identify each item in this table
+    PRIMARY KEY (id)
+
 );
