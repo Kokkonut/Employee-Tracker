@@ -187,16 +187,15 @@ const addDepartment = () => {
 
 //ADD ROLE ---------------------------------
 const addRole = () => {
-    const queryRole = `SELECT department.name AS department
-                        FROM department
-                        `
+    let deptArr = []
+    const queryRole = `SELECT * FROM department`
     connection.query(queryRole, function(err, res) {
         if (err) throw err;
-        const deptget = res  //returns results but not carrying to inquirer
-        console.log(deptget);
-        console.table(deptget);
+        for (let i = 0; i < res.length; i++) {
+            deptArr.push(res[i].name);
+        } 
+        console.log(deptArr)
       
-    
         inquirer
         .prompt([
             {
@@ -211,16 +210,15 @@ const addRole = () => {
             },
             {
                 name: 'department',
-                type: 'rawlist',
-                choices: deptget, //returning undefined
+                type: 'list',
+                choices: deptArr, //returning undefined
                 message: 'Please choose which department this role belongs too'
 
             }
         ])
 
-
+        run();
     })
-    
 
 };
 
