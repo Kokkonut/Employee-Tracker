@@ -31,15 +31,15 @@ function run() {
         .prompt({
             type: 'list',
             choices: [
-                'VIEW all departments',
-                'VIEW all roles',
-                'VIEW all employees',
+                'VIEW all departments', //done
+                'VIEW all roles', //done
+                'VIEW all employees',//done
                 'VIEW employess by manager',
                 'VIEW employess by department',
-                'ADD Department',
-                'ADD Role',
-                'ADD employee',
-                'UPDATE empployee by role',
+                'ADD Department',//done
+                'ADD Role', //done
+                'ADD employee', //next
+                'UPDATE empployee by role',//next
                 'UPDATE employee managers',
                 'DELETE department',
                 'DELETE Role',
@@ -47,7 +47,7 @@ function run() {
                 'VIEW utilized budget',
                 'QUIT'
             ],
-            Message: 'What would yo ulike to do?',
+            Message: 'What would you like to do?',
             name: 'option'
         })
 
@@ -228,7 +228,7 @@ const addRole = () => {
             //   choices: getDepartments()
             // }
         ]).then(function(answers) {
-            let deptId = getDepartments().indexOf(answers.choices) + 1;
+            //let deptId = getDepartments().indexOf(answers.choices) + 1;
             connection.query(
                 "INSERT INTO role SET ?",
                 {
@@ -246,9 +246,85 @@ const addRole = () => {
       });
 };
 
+// ROLE ARRAY SET UP FOR EMPLOYEE ADDITION _____________________
+let roleArr = [];                                            
+function selectRole() {
+  connection.query("SELECT * FROM role", function(err, res) {
+    if (err) throw err
+    for (var i = 0; i < res.length; i++) {
+      roleArr.push(res[i].title);
+    }
+  })
+  return roleArr;
+}
 
+// MANAGER ARRAY SET UP FOR EMPLOYEE ADDITION ____________________
+let managersArr = [];
+function selectManager() {
+  connection.query("SELECT first_name, last_name FROM employee", function(err, res) {
+    if (err) throw err
+    for (var i = 0; i < res.length; i++) {
+      managersArr.push(res[i].first_name);
+    }
+  })
+  return managersArr;
+}
+
+//ADD EMPLOYEE ------------------------------------------------------
 const addEmployee = () => {
-
+inquirer
+    .prompt([
+        {
+            name: 'firstName',
+            type: 'input',
+            message: 'First Name:'
+        },
+        {
+            name: 'lastName',
+            type: 'input',
+            message: 'Last Name:'
+        }, 
+        {
+            name: "role",
+            type: "list",
+            message: "What is the new employee's title? ",
+            choices: selectRole()
+          },
+          {
+              name: "choice",
+              type: "list",
+              message: "Who is managing the new employee? ",
+              choices: selectManager()
+          }
+        
+        // {
+        //     name: 'role',
+        //     type: 'input',
+        //     message: 'What is the new employees title?'
+        // },
+        // {
+        //     name: 'choice',
+        //     type: 'input',
+        //     message: 'Who is managing the new employee?'
+        // },
+    ]).then(function (answers) {
+        var roleId = selectRole().indexOf(answers.role) + 1
+        var managerId = selectManager().indexOf(answers.choice) + 1
+        connection.query("INSERT INTO employee SET ?", 
+        {
+            first_name: answers.firstName,
+            last_name: answers.lastName,
+            manager_id: managerId,
+            role_id: roleId
+            
+        }, 
+        function(err){
+            if (err) throw err
+            console.table(answers)
+            run()
+        })
+  
+    })
 };
 
 
