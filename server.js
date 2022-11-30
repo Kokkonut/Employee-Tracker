@@ -38,8 +38,8 @@ function run() {
                 'VIEW employess by department',
                 'ADD Department',//done
                 'ADD Role', //done
-                'ADD employee', //next
-                'UPDATE empployee by role',//next
+                'ADD employee', //done
+                'UPDATE empployees role',//next
                 'UPDATE employee managers',
                 'DELETE department',
                 'DELETE Role',
@@ -79,7 +79,7 @@ function run() {
                 case 'ADD employee':
                     addEmployee();
                     break;
-                case 'UPDATE empployee by role':
+                case 'UPDATE empployees role':
                     updateEmployeeByRole();
                     break;
                 case 'UPDATE employee managers':
@@ -214,13 +214,6 @@ const addRole = () => {
               type: "input",
               message: "What is the salary of the new role?"
             } ,
-            // {
-            //     name: 'deptId',
-            //     type: 'input',
-            //     message: 'What is the department ID?'
-            // }
-
-            // not working: cant call answers.choices
             {
               name: "department",
               type: "list",
@@ -296,17 +289,7 @@ inquirer
               message: "Who is managing the new employee? ",
               choices: selectManager()
           }
-        
-        // {
-        //     name: 'role',
-        //     type: 'input',
-        //     message: 'What is the new employees title?'
-        // },
-        // {
-        //     name: 'choice',
-        //     type: 'input',
-        //     message: 'Who is managing the new employee?'
-        // },
+
     ]).then(function (answers) {
         var roleId = selectRole().indexOf(answers.role) + 1
         var managerId = selectManager().indexOf(answers.choice) + 1
@@ -327,9 +310,62 @@ inquirer
     })
 };
 
+//GET LIST OF EMPOYEES 
+let employeeArr = []
+const getEmployees = () => {
+    let query = `
+    SELECT
+    CONCAT(first_name, ' ', last_name) AS Employee
+    FROM employee 
+    `
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        for (var i = 0; i < res.length; i++) {
+            employeeArr.push(res[i].Employee)
+        }
+    })
+    console.log(employeeArr)
+    return employeeArr;
+}
 
+//UPDATE EMPLOYEE ROLE
 const updateEmployeeByRole = () => {
+    connection.query("SELECT employee.last_name, role.title FROM employee JOIN role ON employee.role_id = role.id;", 
+    (err, res) => {
+            if (err) throw err;
+ 
+            inquirer.prompt([
+                {
+                    name: "lastName",
+                    type: "rawlist",
+                    choices: function () {
+                        var lastName = [];
+                        for (var i = 0; i < res.length; i++) {
+                            lastName.push(res[i].last_name);
+                        }
+                        return lastName;
+                    },
+                    message: "What is the employee's last name? ",
+                },
+                {
+                    name: "role",
+                    type: "rawlist",
+                    message: "What is the employee's new title? ",
+                    choices: selectRole()
+                },
+            ]).then(function (answers) {
+                let roleId = selectRole().indexOf(answers.role) + 1;
+                const query = 'UPDATE employee SET role_id = ? WHERE last_name = ?';
+                const params = [roleId, answers.lastName];
 
+                connection.query(query, params, function (err, res) {
+                    if (err) throw err;
+                    console.table(answers);
+                    run();
+                })
+
+            });
+        });
 };
 
 
@@ -357,3 +393,6 @@ const viewBudget = () => {
 
 };
 
+const quit = () => {
+    return;
+}
