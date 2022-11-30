@@ -214,27 +214,27 @@ const addRole = () => {
               type: "input",
               message: "What is the salary of the new role?"
             } ,
-            {
-                name: 'deptId',
-                type: 'input',
-                message: 'What is the department ID?'
-            }
+            // {
+            //     name: 'deptId',
+            //     type: 'input',
+            //     message: 'What is the department ID?'
+            // }
 
             // not working: cant call answers.choices
-            // {
-            //   name: "department",
-            //   type: "rawlist",
-            //   message: "Under which department does this new role fall?",
-            //   choices: getDepartments()
-            // }
+            {
+              name: "department",
+              type: "list",
+              message: "Under which department does this new role fall?",
+              choices: getDepartments()
+            }
         ]).then(function(answers) {
-            //let deptId = getDepartments().indexOf(answers.choices) + 1;
+            let deptId = getDepartments().indexOf(answers.department) + 1;
             connection.query(
                 "INSERT INTO role SET ?",
                 {
                   title: answers.title,
                   salary: answers.salary,
-                  department_id: answers.deptId,
+                  department_id: deptId,
                 },
                 function(err) {
                     if (err) throw err
