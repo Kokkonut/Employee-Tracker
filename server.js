@@ -185,41 +185,65 @@ const addDepartment = () => {
 
 };
 
-//ADD ROLE ---------------------------------
-const addRole = () => {
-    let deptArr = []
-    const queryRole = `SELECT * FROM department`
-    connection.query(queryRole, function(err, res) {
-        if (err) throw err;
-        for (let i = 0; i < res.length; i++) {
-            deptArr.push(res[i].name);
-        } 
-        console.log(deptArr)
-      
-        inquirer
-        .prompt([
-            {
-                name: `name`,
-                type: `input`,
-                message: `Please enter name of role`
-            },
-            {
-                name: `salary`,
-                type: `input`,
-                message: `Please enter the salary for the role`
-            },
-            {
-                name: 'department',
-                type: 'list',
-                choices: deptArr, //returning undefined
-                message: 'Please choose which department this role belongs too'
 
-            }
-        ])
-
-        run();
+//GET DEPARTMENTS FOR ADD ROLE FUNCTION --------------------------------
+let deptArr = []
+const getDepartments = () => {
+  
+    connection.query("SELECT * FROM department", function(err, res) {
+        if (err) throw err
+        for (var i = 0; i < res.length; i++) {
+          deptArr.push(res[i].name);
+        }
     })
+    return deptArr;
+};
 
+
+//ADD ROLE ------------------------------------------------------------
+const addRole = () => {
+    connection.query("SELECT role.title AS Title, role.salary AS Salary FROM role LEFT JOIN department.id AS Department FROM department;",   function(err, res) {
+        inquirer.prompt([
+            {
+              name: "title",
+              type: "input",
+              message: "What is name of the new role?"
+            },
+            {
+              name: "salary",
+              type: "input",
+              message: "What is the salary of the new role?"
+            } ,
+            {
+                name: 'deptId',
+                type: 'input',
+                message: 'What is the department ID?'
+            }
+
+            // not working: cant call answers.choices
+            // {
+            //   name: "department",
+            //   type: "rawlist",
+            //   message: "Under which department does this new role fall?",
+            //   choices: getDepartments()
+            // }
+        ]).then(function(answers) {
+            let deptId = getDepartments().indexOf(answers.choices) + 1;
+            connection.query(
+                "INSERT INTO role SET ?",
+                {
+                  title: answers.title,
+                  salary: answers.salary,
+                  department_id: answers.deptId,
+                },
+                function(err) {
+                    if (err) throw err
+                    console.table(answers);
+                    run();
+                }
+            )     
+        });
+      });
 };
 
 
